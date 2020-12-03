@@ -244,19 +244,20 @@ def fix_interface(master):
 
 
 def is_using_bundle_builder(master):
-    openstack = get_layer_number(master, "openstack")
-    return master["layers"][openstack]["config"].get("build_bundle", False)
+    """Returns True if build_bundle is set in any single layer yaml"""
+    for layer in master["layers"]:
+        if layer["config"].get("build_bundle", False):
+            return True
+    return False
 
 
 def is_using_automatic_placement(master):
-    if not is_using_bundle_builder(master):
-        return False
-    openstack = get_layer_number(master, "openstack")
-    return (
-        True
-        if {"name": "automatic-placement"} in master["layers"][openstack]["features"]
-        else False
-    )
+    """Returns True if automatic-placement feature is present in any single layer yaml"""
+    for layer in master["layers"]:
+        if "features" in layer:
+            if {"name": "automatic-placement"} in layer["features"]:
+                return True
+    return False
 
 
 if __name__ == "__main__":
